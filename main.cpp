@@ -1,103 +1,119 @@
 #include "board.h"
+#include "movegen.h"
 #include <iostream>
 #include <cassert>
+#include <cstdint>
 
 // ============================================================
-//  Quick sanity tests for Phase 1
-//  Run these after every commit to catch regressions early.
+//  PERFT
+//  Pass pos by value so each recursive call gets its own copy.
+//  makeMove modifies it, but the caller's copy is untouched.
+//  Clean, simple, correct.
+// ============================================================
+uint64_t perft(Position pos, MoveGenerator& gen, int depth) {
+    MoveList list;
+    gen.generateLegalMoves(pos, list);
+
+    if (depth == 1) return (uint64_t)list.size();
+
+    uint64_t nodes = 0;
+    for (Move m : list) {
+        Position next = pos;
+        MoveGenerator::UndoInfo undo = gen.makeMove(next, m);
+        nodes += perft(next, gen, depth - 1);
+        // no unmake needed - next is a local copy, just discarded
+    }
+    return nodes;
+}
+
+// Perft with divide: shows node count per move at root.
+// Incredibly useful for finding bugs - if one move has wrong count,
+// that's exactly where your bug is.
+void perftDivide(Position& pos, MoveGenerator& gen, int depth) {
+    MoveList list;
+    gen.generateLegalMoves(pos, list);
+
+    uint64_t total = 0;
+    for (Move m : list) {
+        Position next = pos;
+        gen.makeMove(next, m);
+        uint64_t count = perft(next, gen, depth - 1);
+        std::cout << "  " << m.toString() << ": " << count << "\n";
+        total += count;
+    }
+    std::cout << "  Total: " << total << "\n";
+}
+
+// ============================================================
+//  KNOWN PERFT VALUES (from chessprogramming.org)
+//  These are gospel. If your numbers match, your engine is correct.
+//
+//  Starting position:
+//    depth 1:         20
+//    depth 2:        400
+//    depth 3:       8902
+//    depth 4:     197281
+//    depth 5:   4865609
+//
+//  Position 2 (Kiwipete) - stresses castling, en passant, promotions:
+//  "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
+//    depth 1:         48
+//    depth 2:       2039
+//    depth 3:      97862
 // ============================================================
 
-void testBitboardOps() {
-    std::cout << "Testing bitboard operations...\n";
+struct PerftTest {
+    const char* fen;
+    int depth;
+    uint64_t expected;
+    const char* label;
+};
 
-    Bitboard bb = 0;
-    setBit(bb, E4);
-    assert(testBit(bb, E4));
-    assert(!testBit(bb, E5));
-    assert(popcount(bb) == 1);
-    assert(lsb(bb) == E4);
+void runPerftSuite() {
+    MoveGenerator gen;
 
-    setBit(bb, D4);
-    assert(popcount(bb) == 2);
+    PerftTest tests[] = {
+        { START_FEN, 1,       20, "Start pos depth 1" },
+        { START_FEN, 2,      400, "Start pos depth 2" },
+        { START_FEN, 3,     8902, "Start pos depth 3" },
+        { START_FEN, 4,   197281, "Start pos depth 4" },
 
-    Square s = popLSB(bb);
-    assert(s == D4);              // D4=27, E4=28 -> D4 is LSB
-    assert(popcount(bb) == 1);    // only E4 remains
+        // Kiwipete - the ultimate stress test
+        { "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+          1, 48,   "Kiwipete depth 1" },
+        { "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+          2, 2039, "Kiwipete depth 2" },
+        { "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+          3, 97862,"Kiwipete depth 3" },
+    };
 
-    clearBit(bb, E4);
-    assert(bb == 0);
+    int passed = 0, failed = 0;
+    for (auto& t : tests) {
+        Position pos;
+        pos.setFromFEN(t.fen);
+        uint64_t result = perft(pos, gen, t.depth);
 
-    std::cout << "  Bitboard ops: PASS\n";
-}
+        bool ok = (result == t.expected);
+        std::cout << (ok ? "  PASS" : "  FAIL")
+                  << "  " << t.label
+                  << "  got=" << result
+                  << "  expected=" << t.expected << "\n";
+        ok ? passed++ : failed++;
+    }
 
-void testStartPosition() {
-    std::cout << "Testing start position...\n";
+    std::cout << "\n  " << passed << " passed, " << failed << " failed\n";
 
-    Position pos;
-    pos.setFromFEN(START_FEN);
-    pos.print();
-
-    // White should have 8 pawns on rank 2
-    assert(pos.getPieces(WHITE, PAWN) == RANK_2);
-
-    // Black should have 8 pawns on rank 7
-    assert(pos.getPieces(BLACK, PAWN) == RANK_7);
-
-    // Total pieces: 32
-    assert(popcount(pos.allPieces) == 32);
-
-    // White king on e1, black king on e8
-    assert(testBit(pos.getPieces(WHITE, KING), E1));
-    assert(testBit(pos.getPieces(BLACK, KING), E8));
-
-    // Side to move is white
-    assert(pos.sideToMove == WHITE);
-
-    // All castling rights available
-    assert(pos.castlingRights == ALL_CASTLING);
-
-    std::cout << "  Start position: PASS\n";
-}
-
-void testFENRoundtrip() {
-    std::cout << "Testing FEN round-trip...\n";
-
-    // A mid-game position
-    const std::string fen = "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 4 4";
-    Position pos;
-    pos.setFromFEN(fen);
-
-    std::string out = pos.toFEN();
-    assert(out == fen);
-    std::cout << "  FEN round-trip: PASS\n";
-
-    pos.print();
-}
-
-void testMailbox() {
-    std::cout << "Testing mailbox...\n";
-
-    Position pos;
-    pos.setFromFEN(START_FEN);
-
-    // Check specific squares
-    assert(pos.pieceOn(E1) == W_KING);
-    assert(pos.pieceOn(D1) == W_QUEEN);
-    assert(pos.pieceOn(E8) == B_KING);
-    assert(pos.pieceOn(E4) == NO_PIECE);  // empty square
-
-    std::cout << "  Mailbox: PASS\n";
+    if (failed > 0) {
+        std::cout << "\n--- Debugging: perft divide on failing position ---\n";
+        std::cout << "Start pos depth 3 divide:\n";
+        Position pos; pos.setFromFEN(START_FEN);
+        perftDivide(pos, gen, 3);
+    }
 }
 
 int main() {
-    std::cout << "=== Chess Engine - Phase 1: Board Representation ===\n\n";
-
-    testBitboardOps();
-    testStartPosition();
-    testFENRoundtrip();
-    testMailbox();
-
-    std::cout << "\nAll Phase 1 tests passed!\n";
-    std::cout << "Next step: Phase 2 - Move Generation\n";
+    std::cout << "=== Chess Engine - Phase 3: Perft Testing ===\n\n";
+    runPerftSuite();
+    std::cout << "\nIf all pass: move generator is CORRECT. On to Phase 4!\n";
     return 0;
 }

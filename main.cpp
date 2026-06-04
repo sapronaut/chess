@@ -2,6 +2,11 @@
 #include <iostream>
 #include <cassert>
 
+// ============================================================
+//  Quick sanity tests for Phase 1
+//  Run these after every commit to catch regressions early.
+// ============================================================
+
 void testBitboardOps() {
     std::cout << "Testing bitboard operations...\n";
 

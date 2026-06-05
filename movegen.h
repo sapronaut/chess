@@ -10,7 +10,10 @@ public:
     void generatePseudoLegal(const Position& pos, MoveList& list);
     bool isInCheck(const Position& pos, Color c) const;
 
+<<<<<<< HEAD
     // Public so perft and search can use them
+=======
+>>>>>>> phase-6-improvements
     struct UndoInfo {
         Piece  captured;
         int    castlingRights;

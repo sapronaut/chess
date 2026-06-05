@@ -10,6 +10,16 @@ public:
     void generatePseudoLegal(const Position& pos, MoveList& list);
     bool isInCheck(const Position& pos, Color c) const;
 
+    // Public so perft and search can use them
+    struct UndoInfo {
+        Piece  captured;
+        int    castlingRights;
+        Square enPassantSquare;
+        int    halfmoveClock;
+    };
+    UndoInfo makeMove(Position& pos, Move m) const;
+    void     unmakeMove(Position& pos, Move m, const UndoInfo& undo) const;
+
 private:
     Bitboard knightAttacks[64];
     Bitboard kingAttacks[64];
@@ -32,13 +42,4 @@ private:
     void generateCastlingMoves(const Position& pos, MoveList& list);
 
     bool isSquareAttacked(const Position& pos, Square sq, Color attacker) const;
-
-    struct UndoInfo {
-        Piece  captured;
-        int    castlingRights;
-        Square enPassantSquare;
-        int    halfmoveClock;
-    };
-    UndoInfo makeMove(Position& pos, Move m) const;
-    void     unmakeMove(Position& pos, Move m, const UndoInfo& undo) const;
 };

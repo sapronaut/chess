@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chesszzz</title>
+    <link rel="stylesheet" href="static/style.css">
+
+    <!-- chessboard.js -->
+    <link rel="stylesheet"
+      href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+
+    <!-- chess.js for move validation on frontend -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <!-- Home screen -->
+    <div id="home-screen" class="screen">
+    <div class="logo">♟</div>
+    <h1>SapChess</h1>
+    <p class="subtitle">A chess engine built from scratch in C++</p>
+    <div class="built-with">
+        Built with <span>C++17</span> · Bitboards · Alpha-Beta · UCI
+    </div>
+    <div class="buttons">
+        <button class="btn primary" onclick="startBotGame()">
+            🤖 Play vs Bot
+        </button>
+        <button class="btn secondary" onclick="showMultiplayer()">
+            👥 Play vs Friend
+        </button>
+    </div>
+</div>
+
+    <!-- Multiplayer setup screen -->
+    <div id="multiplayer-screen" class="screen hidden">
+        <h2>Play vs Friend</h2>
+        <div class="mp-options">
+            <button class="btn primary" onclick="createRoom()">
+                Create Room
+            </button>
+            <div class="divider">or</div>
+            <input id="room-input" type="text" placeholder="Enter room code...">
+            <button class="btn secondary" onclick="joinRoom()">
+                Join Room
+            </button>
+        </div>
+        <button class="btn ghost" onclick="showHome()">← Back</button>
+    </div>
+
+    <!-- Game screen -->
+    <div id="game-screen" class="screen hidden">
+        <div class="game-layout">
+            <div class="board-section">
+                <div id="player-black" class="player-tag">
+                    <span class="player-icon">⬛</span>
+                    <span id="black-name">Black</span>
+                </div>
+                <div id="board"></div>
+                <div id="player-white" class="player-tag">
+                    <span class="player-icon">⬜</span>
+                    <span id="white-name">White</span>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div id="status-box">
+                    <div id="status">Your turn</div>
+                </div>
+
+                <div id="room-info" class="hidden">
+                    <div class="room-code-label">Room Code</div>
+                    <div id="room-code-display" class="room-code"></div>
+                    <button onclick="copyRoomCode()" class="btn ghost small">
+                        Copy Link
+                    </button>
+                </div>
+
+                <div id="move-history" class="move-history">
+                    <div class="move-history-label">Moves</div>
+                    <div id="moves-list"></div>
+                </div>
+
+                <div class="game-buttons">
+                    <button class="btn ghost" onclick="showHome()">
+                        🏠 Home
+                    </button>
+                    <button class="btn ghost" onclick="flipBoard()">
+                        🔄 Flip
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="static/game.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=League+Spartan:wght@300;400;500;600;700;800;900&display=swap');
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -7,9 +7,9 @@
     --bg2:       #13131f;
     --bg3:       #1c1c2e;
     --border:    #2a2a45;
-    --accent1:   #7c6af7;
-    --accent2:   #f7517c;
-    --accent3:   #51d4f7;
+--accent1: #d6b25e;
+--accent2: #d6b25e;
+--accent3: #d6b25e;
     --text:      #e8e8f0;
     --muted:     #5a5a7a;
     --success:   #51f7a0;
@@ -20,7 +20,7 @@
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'League Spartan', sans-serif;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -40,6 +40,30 @@ body::before {
     pointer-events: none;
     z-index: 0;
 }
+body::after {
+    content: '';
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(140,123,255,0.12),
+            transparent 35%
+        ),
+
+        radial-gradient(
+            circle at 80% 70%,
+            rgba(140,123,255,0.08),
+            transparent 40%
+        );
+
+    pointer-events: none;
+
+    z-index: 0;
+}
 
 .container {
     width: 100%;
@@ -55,6 +79,9 @@ body::before {
 
 /* ---- Home screen ---- */
 #home-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     padding: 80px 20px;
 }
@@ -72,15 +99,20 @@ body::before {
 }
 
 #home-screen h1 {
-    font-size: 3.8rem;
+    font-family: 'Cormorant Garamond', serif;
+
+    font-size: clamp(4rem, 10vw, 8rem);
+
     font-weight: 700;
-    letter-spacing: -1px;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
-    background-size: 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradientShift 4s ease infinite;
+
+    letter-spacing: -3px;
+
+    color: #f5f5f5;
+
+    text-shadow:
+        0 0 30px rgba(255,255,255,0.08);
+
+    margin-bottom: 32px;
 }
 
 @keyframes gradientShift {
@@ -88,27 +120,39 @@ body::before {
     50%  { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
-
 .subtitle {
-    color: var(--muted);
-    font-size: 1rem;
-    font-weight: 400;
-    margin-bottom: 12px;
-    letter-spacing: 0.5px;
+    margin-bottom: 32px;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #8f8fa6;
 }
 
 .built-with {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
+    justify-content: center;
+
+    width: fit-content;
+    margin: 0 auto 40px auto;
+
+    padding: 8px 20px;
+
+    background: rgba(28, 28, 46, 0.65);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
     border-radius: 999px;
-    padding: 6px 16px;
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-bottom: 48px;
-    font-family: 'Space Mono', monospace;
+
+    font-family: 'League Spartan', sans-serif;
+    font-size: 0.9rem;
+
+    color: #b8b8c7;
 }
 
 .built-with span {
@@ -130,7 +174,7 @@ body::before {
     border-radius: 10px;
     font-size: 1rem;
     cursor: pointer;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'League Spartan', sans-serif;
     font-weight: 600;
     letter-spacing: 0.3px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -150,15 +194,24 @@ body::before {
 .btn:hover::after { opacity: 0.05; }
 .btn:active { transform: scale(0.97); }
 
+
 .btn.primary {
-    background: linear-gradient(135deg, var(--accent1), #9b59f7);
+    background: #8c7bff;
+
     color: white;
-    box-shadow: 0 4px 24px var(--glow1);
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    box-shadow:
+        0 8px 30px rgba(140,123,255,.25);
 }
 
+
 .btn.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px var(--glow1);
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 15px 40px rgba(140,123,255,.35);
 }
 
 .btn.secondary {
@@ -199,12 +252,25 @@ body::before {
 }
 
 #multiplayer-screen h2 {
-    font-size: 2rem;
+    font-family: 'Cormorant Garamond', serif;
+
+    font-size: clamp(2.5rem, 5vw, 4rem);
+
     font-weight: 700;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, var(--accent1), var(--accent3));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+
+    color: #f5f5f5;
+}
+.player-tag {
+background: rgba(28, 28, 46, 0.65);
+
+backdrop-filter: blur(12px);
+
+-webkit-backdrop-filter: blur(12px);
+
+border: 1px solid rgba(255,255,255,0.08);
+}
+#status {
+    font-family: 'Cormorant Garamond', serif;
 }
 
 #multiplayer-screen .subtitle {
@@ -243,7 +309,7 @@ body::before {
     font-size: 1.1rem;
     text-align: center;
     letter-spacing: 4px;
-    font-family: 'Space Mono', monospace;
+    font-family: 'League Spartan', sans-serif;
     font-weight: 700;
     width: 100%;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -279,13 +345,17 @@ body::before {
 
 /* Board wrapper glow */
 #board {
-    width: 480px !important;
-    border-radius: 4px;
-    box-shadow:
-        0 0 0 2px var(--border),
-        0 0 40px rgba(124, 106, 247, 0.15),
-        0 20px 60px rgba(0,0,0,0.5);
+    width: min(480px, 90vw) !important;
+
+    border-radius: 12px;
+
     overflow: hidden;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+        0 40px 90px rgba(0,0,0,.65),
+        0 0 60px rgba(140,123,255,.15);
 }
 
 /* Override chessboard.js colors */
@@ -321,11 +391,13 @@ body::before {
 }
 
 #status-box {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
+background: rgba(28, 28, 46, 0.65);
+
+backdrop-filter: blur(12px);
+
+-webkit-backdrop-filter: blur(12px);
+
+border: 1px solid rgba(255,255,255,0.08);
 }
 
 #status {
@@ -337,11 +409,13 @@ body::before {
 
 /* Room code */
 #room-info {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
+background: rgba(28, 28, 46, 0.65);
+
+backdrop-filter: blur(12px);
+
+-webkit-backdrop-filter: blur(12px);
+
+border: 1px solid rgba(255,255,255,0.08);
 }
 
 .room-code-label {
@@ -353,24 +427,24 @@ body::before {
 }
 
 .room-code {
-    font-family: 'Space Mono', monospace;
-    font-size: 1.8rem;
-    font-weight: 700;
-    letter-spacing: 6px;
-    color: var(--accent1);
-    margin-bottom: 10px;
-    text-shadow: 0 0 20px var(--glow1);
+    font-family: 'League Spartan', sans-serif;
+
+    font-size: 2.2rem;
+
+    letter-spacing: 8px;
+
+    color: #8c7bff;
 }
 
 /* Move history */
 .move-history {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    max-height: 280px;
-    overflow-y: auto;
-    flex: 1;
+background: rgba(28, 28, 46, 0.65);
+
+backdrop-filter: blur(12px);
+
+-webkit-backdrop-filter: blur(12px);
+
+border: 1px solid rgba(255,255,255,0.08);
 }
 
 .move-history::-webkit-scrollbar { width: 4px; }
@@ -395,7 +469,7 @@ body::before {
 }
 
 #moves-list span {
-    font-family: 'Space Mono', monospace;
+    font-family: 'League Spartan', sans-serif;
     font-size: 0.82rem;
     color: var(--text);
     padding: 3px 6px;

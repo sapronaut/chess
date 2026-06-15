@@ -1,4 +1,5 @@
-fastapi
-uvicorn
-python-chess
 websockets
+fastapi>=0.110
+uvicorn>=0.29
+pydantic>=2.6
+chess>=1.10

@@ -1,15 +1,3 @@
-"""
-LLM client setup for move explanations.
-
-Wraps the Anthropic API client with configuration pulled from
-environment variables, so the rest of the app doesn't need to know
-about API keys or model names directly.
-
-Environment variables:
-    ANTHROPIC_API_KEY      - required, your Anthropic API key
-    EXPLAIN_MODEL          - optional, defaults to "claude-haiku-4-5-20251001"
-    EXPLAIN_MAX_TOKENS     - optional, defaults to 200
-"""
 
 from __future__ import annotations
 
